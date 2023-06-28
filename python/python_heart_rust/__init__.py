@@ -4,12 +4,12 @@ import collections
 import requests
 import os.path
 
-BIBLE_URL: str = "https://www.sermon-online.com/download/german/MartinLuther-1912/Martin_Luther_Uebersetzung_1912.txt"
-BIBLE_FILE: str = "bible.txt"
-
 __doc__ = python_heart_rust.__doc__
 if hasattr(python_heart_rust, "__all__"):
     __all__ = python_heart_rust.__all__
+
+BIBLE_URL: str = "https://www.sermon-online.com/download/german/MartinLuther-1912/Martin_Luther_Uebersetzung_1912.txt"
+BIBLE_FILE: str = "bible.txt"
 
 
 def get_and_open_bible() -> list[str]:
