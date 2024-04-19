@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use pyo3::prelude::*;
+use pyo3::{prelude::*, pybacked::PyBackedStr};
 use rayon::prelude::*;
 
 const CHUNK_SIZE: usize = 1000;
@@ -25,11 +25,11 @@ fn update_word_count(line: &str, words: &mut HashMap<String, u32>) {
 
 /// Counts words in given lines
 #[pyfunction]
-fn get_word_counter_dict_rs(lines: Vec<&str>) -> HashMap<String, u32> {
+fn get_word_counter_dict_rs(lines: Vec<PyBackedStr>) -> HashMap<String, u32> {
     let mut words: HashMap<String, u32> = HashMap::new();
 
     for line in lines {
-        update_word_count(line, &mut words);
+        update_word_count(&line, &mut words);
     }
 
     words
@@ -37,7 +37,7 @@ fn get_word_counter_dict_rs(lines: Vec<&str>) -> HashMap<String, u32> {
 
 /// Counts words in given lines in parallel
 #[pyfunction]
-fn get_word_counter_dict_parallel_rs(lines: Vec<&str>) -> HashMap<String, u32> {
+fn get_word_counter_dict_parallel_rs(lines: Vec<PyBackedStr>) -> HashMap<String, u32> {
     let words: Mutex<HashMap<String, u32>> = Mutex::new(HashMap::new());
 
     lines.par_chunks(CHUNK_SIZE).for_each(|lines| {
@@ -56,9 +56,8 @@ fn get_word_counter_dict_parallel_rs(lines: Vec<&str>) -> HashMap<String, u32> {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn python_heart_rust(_py: Python, m: &PyModule) -> PyResult<()> {
+fn python_heart_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_word_counter_dict_rs, m)?)?;
     m.add_function(wrap_pyfunction!(get_word_counter_dict_parallel_rs, m)?)?;
     Ok(())
 }
-
